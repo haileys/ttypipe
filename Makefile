@@ -1,5 +1,5 @@
 INSTALL_PREFIX ?= /usr/local
-CFLAGS = -Wall -Wextra -pedantic -Werror
+CFLAGS = -Wall -Wextra -pedantic -Werror -std=c99
 
 all: ttypipe
 
