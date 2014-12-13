@@ -42,11 +42,7 @@ main(int argc, const char** argv)
         }
 
         struct termios raw_termios = orig_termios;
-
-        raw_termios.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-        raw_termios.c_oflag &= ~(OPOST);
-        raw_termios.c_cflag |= (CS8);
-        raw_termios.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+        cfmakeraw(&raw_termios);
 
         if(tcsetattr(0, TCSAFLUSH, &raw_termios) < 0) {
             perror("tcsetattr(raw_termios)");
