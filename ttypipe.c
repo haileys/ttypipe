@@ -1,3 +1,5 @@
+#define _DEFAULT_SOURCE
+
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <stdio.h>
