@@ -1,16 +1,13 @@
 #define _DEFAULT_SOURCE
 
-#include <sys/ioctl.h>
-#include <termios.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <unistd.h>
 
 static bool sigint_occurred = false;
 
@@ -86,6 +83,6 @@ main(int argc, const char** argv)
             return 1;
         }
     }
-    
+
     return 0;
 }
