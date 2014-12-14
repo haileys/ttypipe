@@ -2,7 +2,6 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -10,17 +9,9 @@
 #include <termios.h>
 #include <unistd.h>
 
-static bool sigint_occurred = false;
-
 static bool interactive = false;
 
 struct termios orig_termios, raw_termios;
-
-static void
-sigint()
-{
-    sigint_occurred = true;
-}
 
 static void
 init_termios()
@@ -86,9 +77,7 @@ main(int argc, const char** argv)
     init_termios();
     raw_on();
 
-    signal(SIGINT, sigint);
-
-    while(!sigint_occurred) {
+    while(true) {
         char c;
         int rc = read(0, &c, 1);
 
