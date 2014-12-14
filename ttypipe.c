@@ -60,6 +60,14 @@ raw_off()
     }
 }
 
+static void
+fatal(const char* msg)
+{
+    raw_off();
+    perror(msg);
+    exit(EXIT_FAILURE);
+}
+
 int
 main(int argc, const char** argv)
 {
@@ -85,8 +93,7 @@ main(int argc, const char** argv)
         int rc = read(0, &c, 1);
 
         if(rc < 0) {
-            perror("read");
-            break;
+            fatal("read");
         }
 
         if(rc == 0) {
@@ -95,8 +102,9 @@ main(int argc, const char** argv)
 
         if(ioctl(tty_fd, TIOCSTI, &c) < 0) {
             if(errno != EIO) {
-                perror("ioctl(TIOCSTI)");
+                fatal("ioctl(TIOCSTI)");
             }
+
             break;
         }
     }
