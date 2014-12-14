@@ -11,6 +11,8 @@
 
 static bool sigint_occurred = false;
 
+static bool interactive = false;
+
 static void
 sigint()
 {
@@ -34,7 +36,9 @@ main(int argc, const char** argv)
 
     struct termios orig_termios;
 
-    if(isatty(0)) {
+    interactive = isatty(0);
+
+    if(interactive) {
         if(tcgetattr(0, &orig_termios) < 0) {
             perror("tcgetattr");
             return 1;
@@ -77,7 +81,7 @@ main(int argc, const char** argv)
         }
     }
 
-    if(isatty(0)) {
+    if(interactive) {
         if(tcsetattr(0, TCSAFLUSH, &orig_termios) < 0) {
             perror("tcsetattr(orig_termios)");
             return 1;
