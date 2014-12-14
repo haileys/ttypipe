@@ -82,6 +82,10 @@ main(int argc, const char** argv)
         int rc = read(0, &c, 1);
 
         if(rc < 0) {
+            if(errno == EINTR) {
+                continue;
+            }
+
             fatal("read");
         }
 
