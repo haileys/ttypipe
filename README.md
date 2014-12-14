@@ -12,3 +12,5 @@ For convenience, ttypipe will also switch the controlling terminal into raw mode
 # make install
 # ttypipe /dev/tty1
 ```
+
+To quit ttypipe in interactive mode, hit `^\` then `q`. To type a literal `^\`, just type `\` again.
