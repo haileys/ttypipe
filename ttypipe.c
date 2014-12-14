@@ -101,11 +101,24 @@ main(int argc, const char** argv)
         }
 
         if(ioctl(tty_fd, TIOCSTI, &c) < 0) {
-            if(errno != EIO) {
-                fatal("ioctl(TIOCSTI)");
+            if(errno == EIO) {
+                // re-open the terminal
+                close(tty_fd);
+
+                tty_fd = open(argv[1], O_RDWR);
+
+                if(tty_fd < 0) {
+                    fatal("open");
+                }
+
+                // try pushing the character again, and bail out if it fails
+                // the second time
+                if(ioctl(tty_fd, TIOCSTI, &c) == 0) {
+                    continue;
+                }
             }
 
-            break;
+            fatal("ioctl(TIOCSTI)");
         }
     }
 
