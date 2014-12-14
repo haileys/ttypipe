@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
@@ -19,6 +20,32 @@ static void
 sigint()
 {
     sigint_occurred = true;
+}
+
+static void
+init_termios()
+{
+    interactive = isatty(0);
+
+    if(interactive) {
+        if(tcgetattr(0, &orig_termios) < 0) {
+            perror("tcgetattr");
+            exit(EXIT_FAILURE);
+        }
+
+        raw_termios = orig_termios;
+        cfmakeraw(&raw_termios);
+
+        if(tcsetattr(0, TCSAFLUSH, &raw_termios) < 0) {
+            perror("tcsetattr(raw_termios)");
+
+            if(tcsetattr(0, TCSAFLUSH, &orig_termios) < 0) {
+                perror("tcsetattr(orig_termios)");
+            }
+
+            exit(EXIT_FAILURE);
+        }
+    }
 }
 
 int
@@ -36,27 +63,7 @@ main(int argc, const char** argv)
         return 1;
     }
 
-    interactive = isatty(0);
-
-    if(interactive) {
-        if(tcgetattr(0, &orig_termios) < 0) {
-            perror("tcgetattr");
-            return 1;
-        }
-
-        raw_termios = orig_termios;
-        cfmakeraw(&raw_termios);
-
-        if(tcsetattr(0, TCSAFLUSH, &raw_termios) < 0) {
-            perror("tcsetattr(raw_termios)");
-
-            if(tcsetattr(0, TCSAFLUSH, &orig_termios) < 0) {
-                perror("tcsetattr(orig_termios)");
-            }
-
-            return 1;
-        }
-    }
+    init_termios();
 
     signal(SIGINT, sigint);
 
