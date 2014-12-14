@@ -35,14 +35,26 @@ init_termios()
 
         raw_termios = orig_termios;
         cfmakeraw(&raw_termios);
+    }
+}
 
+static void
+raw_on()
+{
+    if(interactive) {
         if(tcsetattr(0, TCSAFLUSH, &raw_termios) < 0) {
-            perror("tcsetattr(raw_termios)");
+            perror("raw_on");
+            exit(EXIT_FAILURE);
+        }
+    }
+}
 
-            if(tcsetattr(0, TCSAFLUSH, &orig_termios) < 0) {
-                perror("tcsetattr(orig_termios)");
-            }
-
+static void
+raw_off()
+{
+    if(interactive) {
+        if(tcsetattr(0, TCSAFLUSH, &orig_termios) < 0) {
+            perror("raw_off");
             exit(EXIT_FAILURE);
         }
     }
@@ -64,6 +76,7 @@ main(int argc, const char** argv)
     }
 
     init_termios();
+    raw_on();
 
     signal(SIGINT, sigint);
 
@@ -89,10 +102,7 @@ main(int argc, const char** argv)
     }
 
     if(interactive) {
-        if(tcsetattr(0, TCSAFLUSH, &orig_termios) < 0) {
-            perror("tcsetattr(orig_termios)");
-            return 1;
-        }
+        raw_off();
     }
 
     return 0;
