@@ -9,6 +9,8 @@
 #include <termios.h>
 #include <unistd.h>
 
+#define ESCAPE 28 // ctrl+backslash
+
 static bool interactive = false;
 
 struct termios orig_termios, raw_termios;
@@ -93,6 +95,44 @@ main(int argc, const char** argv)
             break;
         }
 
+        if(interactive && c == ESCAPE) {
+            printf(":");
+            fflush(stdout);
+
+            while(1) {
+                rc = read(0, &c, 1);
+
+                if(rc < 0) {
+                    if(errno == EINTR) {
+                        continue;
+                    }
+
+                    fatal("read");
+                }
+
+                if(rc == 0) {
+                    goto quit;
+                }
+
+                if(c == '\\' || c == ESCAPE) {
+                    // pass through ^\ to tty
+                    printf("\b \b");
+                    fflush(stdout);
+                    c = ESCAPE;
+                    break;
+                }
+
+                if(c == 'q' || c == 'Q') {
+                    // quit
+                    printf("\b \b");
+                    fflush(stdout);
+                    goto quit;
+                }
+
+                printf("\a");
+            }
+        }
+
         if(ioctl(tty_fd, TIOCSTI, &c) < 0) {
             if(errno == EIO) {
                 // re-open the terminal
@@ -115,6 +155,7 @@ main(int argc, const char** argv)
         }
     }
 
+quit:
     if(interactive) {
         raw_off();
     }
