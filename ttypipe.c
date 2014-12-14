@@ -13,6 +13,8 @@ static bool sigint_occurred = false;
 
 static bool interactive = false;
 
+struct termios orig_termios, raw_termios;
+
 static void
 sigint()
 {
@@ -34,8 +36,6 @@ main(int argc, const char** argv)
         return 1;
     }
 
-    struct termios orig_termios;
-
     interactive = isatty(0);
 
     if(interactive) {
@@ -44,7 +44,7 @@ main(int argc, const char** argv)
             return 1;
         }
 
-        struct termios raw_termios = orig_termios;
+        raw_termios = orig_termios;
         cfmakeraw(&raw_termios);
 
         if(tcsetattr(0, TCSAFLUSH, &raw_termios) < 0) {
